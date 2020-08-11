@@ -3,8 +3,8 @@ import { View } from 'react-native';
 
 import styles from './styles';
 
-const Study = () => {
+const Favorites = () => {
 	return <View />;
 };
 
-export default Study;
+export default Favorites;
