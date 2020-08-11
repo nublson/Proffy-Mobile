@@ -1,6 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
-import { StyleSheet, View, Text } from 'react-native';
 import { AppLoading } from 'expo';
 import {
 	Archivo_400Regular,
@@ -11,6 +10,8 @@ import {
 	Poppins_400Regular,
 	Poppins_600SemiBold,
 } from '@expo-google-fonts/poppins';
+
+import Landing from './src/pages/Landing';
 
 export default function App() {
 	let [fontsLoaded] = useFonts({
@@ -24,18 +25,10 @@ export default function App() {
 		return <AppLoading />;
 	} else {
 		return (
-			<View style={styles.container}>
-				<Text>Hello World!</Text>
-				<StatusBar style='auto' />
-			</View>
+			<>
+				<Landing />
+				<StatusBar style='light' />
+			</>
 		);
 	}
 }
-
-const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		justifyContent: 'center',
-		alignItems: 'center',
-	},
-});
