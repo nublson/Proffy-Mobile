@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Image, Text, Linking } from 'react-native';
 import { RectButton } from 'react-native-gesture-handler';
+import AsyncStorage from '@react-native-community/async-storage';
 
 import api from '../../services/api';
 import heartOutlineIcon from '../../assets/images/icons/heart-outline.png';
@@ -22,12 +23,42 @@ export interface Teacher {
 
 interface ITeacherItemProps {
 	teacher: Teacher;
+	favorited: Boolean;
 }
 
-const TeacherItem: React.FC<ITeacherItemProps> = ({ teacher }) => {
+const TeacherItem: React.FC<ITeacherItemProps> = ({ teacher, favorited }) => {
+	const [isFavorited, setIsfavorited] = useState(favorited);
+
 	const handleLinkToWhatsapp = () => {
 		api.post('/connections', { user_id: teacher.user_id });
 		Linking.openURL(`whatsapp://send?phone=${teacher.whatsapp}`);
+	};
+
+	const handleToggleFavorite = async () => {
+		const favorites = await AsyncStorage.getItem('favorites');
+
+		let favoritesArray = [];
+
+		if (favorites) {
+			favoritesArray = JSON.parse(favorites);
+		}
+
+		if (isFavorited) {
+			const favoriteIndex = favoritesArray.findIndex(
+				(teacherItem: Teacher) => {
+					return teacherItem.id === teacher.id;
+				}
+			);
+
+			favoritesArray.splice(favoriteIndex, 1);
+			setIsfavorited(false);
+		} else {
+			favoritesArray.push(teacher);
+
+			setIsfavorited(true);
+		}
+
+		await AsyncStorage.setItem('favorites', JSON.stringify(favoritesArray));
 	};
 
 	return (
@@ -51,10 +82,17 @@ const TeacherItem: React.FC<ITeacherItemProps> = ({ teacher }) => {
 
 				<View style={styles.buttonsContainer}>
 					<RectButton
-						style={[styles.favoriteButton, styles.favorited]}
+						onPress={handleToggleFavorite}
+						style={[
+							styles.favoriteButton,
+							isFavorited && styles.favorited,
+						]}
 					>
-						{/* <Image source={heartOutlineIcon} /> */}
-						<Image source={unfavoriteIcon} />
+						{isFavorited ? (
+							<Image source={unfavoriteIcon} />
+						) : (
+							<Image source={heartOutlineIcon} />
+						)}
 					</RectButton>
 					<RectButton
 						onPress={handleLinkToWhatsapp}
